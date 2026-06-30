@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -7,59 +8,59 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; padding: 24px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #191919; color: #e8e8e6; padding: 24px; }
   h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-  .subtitle { font-size: 13px; color: #888; margin-bottom: 24px; }
-  .section-title { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 10px; }
+  .subtitle { font-size: 13px; color: #777; margin-bottom: 24px; }
+  .section-title { font-size: 11px; font-weight: 600; color: #777; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 10px; }
   .params-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px; }
-  .param-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px 14px; }
-  .param-label { font-size: 12px; color: #666; margin-bottom: 6px; }
+  .param-card { background: #252525; border: 1px solid #333; border-radius: 8px; padding: 12px 14px; }
+  .param-label { font-size: 12px; color: #999; margin-bottom: 6px; }
   .param-row { display: flex; align-items: center; gap: 8px; }
   .param-row input[type=range] { flex: 1; accent-color: #2a78d6; }
-  .param-val { font-size: 13px; font-weight: 600; color: #1a1a1a; min-width: 56px; text-align: right; }
+  .param-val { font-size: 13px; font-weight: 600; color: #e8e8e6; min-width: 56px; text-align: right; }
   .open-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px; }
-  .year-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px; text-align: center; }
-  .year-label { font-size: 12px; color: #888; margin-bottom: 6px; }
-  .year-count { font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
+  .year-card { background: #252525; border: 1px solid #333; border-radius: 8px; padding: 12px; text-align: center; }
+  .year-label { font-size: 12px; color: #777; margin-bottom: 6px; }
+  .year-count { font-size: 24px; font-weight: 600; color: #e8e8e6; margin-bottom: 6px; }
   .year-btns { display: flex; justify-content: center; gap: 6px; }
-  .year-btns button { width: 28px; height: 28px; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f3; color: #1a1a1a; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .year-btns button:hover { background: #e5e5e5; }
+  .year-btns button { width: 28px; height: 28px; border: 1px solid #3a3a3a; border-radius: 6px; background: #191919; color: #e8e8e6; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .year-btns button:hover { background: #333; }
   .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 20px; }
-  .metric-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px 14px; }
-  .metric-label { font-size: 11px; color: #888; margin-bottom: 4px; }
-  .metric-value { font-size: 18px; font-weight: 600; color: #1a1a1a; }
-  .metric-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
-  .ev-section { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+  .metric-card { background: #252525; border: 1px solid #333; border-radius: 8px; padding: 12px 14px; }
+  .metric-label { font-size: 11px; color: #777; margin-bottom: 4px; }
+  .metric-value { font-size: 18px; font-weight: 600; color: #e8e8e6; }
+  .metric-sub { font-size: 11px; color: #666; margin-top: 2px; }
+  .ev-section { background: #252525; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
   .ev-params { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 14px; align-items: center; }
-  .ev-param { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666; }
+  .ev-param { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #999; }
   .ev-param input[type=range] { width: 90px; accent-color: #2a78d6; }
-  .ev-param .val { font-weight: 600; color: #1a1a1a; min-width: 28px; }
+  .ev-param .val { font-weight: 600; color: #e8e8e6; min-width: 28px; }
   .ev-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-  .ev-card { background: #f5f5f3; border: 1px solid #e5e5e5; border-radius: 8px; padding: 10px 12px; text-align: center; }
-  .ev-year { font-size: 11px; color: #aaa; margin-bottom: 3px; }
-  .ev-profit { font-size: 12px; color: #666; margin-bottom: 4px; }
+  .ev-card { background: #2a2a2a; border: 1px solid #333; border-radius: 8px; padding: 10px 12px; text-align: center; }
+  .ev-year { font-size: 11px; color: #666; margin-bottom: 3px; }
+  .ev-profit { font-size: 12px; color: #999; margin-bottom: 4px; }
   .ev-value { font-size: 15px; font-weight: 600; color: #2a78d6; }
-  .ev-range { font-size: 11px; color: #aaa; margin-top: 2px; }
-  .calc-note { font-size: 11px; color: #aaa; margin-top: 10px; }
-  .chart-area { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
-  .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; font-size: 12px; color: #666; }
+  .ev-range { font-size: 11px; color: #666; margin-top: 2px; }
+  .calc-note { font-size: 11px; color: #666; margin-top: 10px; }
+  .chart-area { background: #252525; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; font-size: 12px; color: #999; }
   .chart-legend span { display: flex; align-items: center; gap: 5px; }
   .dot { width: 10px; height: 10px; border-radius: 2px; }
   .line-dash { width: 18px; height: 2px; border-radius: 1px; }
   .toggle-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-  .toggle-btn { padding: 5px 14px; border: 1px solid #ddd; border-radius: 6px; background: #fff; color: #666; font-size: 13px; cursor: pointer; }
-  .toggle-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-  .table-wrap { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; overflow: auto; }
+  .toggle-btn { padding: 5px 14px; border: 1px solid #3a3a3a; border-radius: 6px; background: #252525; color: #999; font-size: 13px; cursor: pointer; }
+  .toggle-btn.active { background: #e8e8e6; color: #191919; border-color: #e8e8e6; }
+  .table-wrap { background: #252525; border: 1px solid #333; border-radius: 8px; overflow: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 560px; }
-  th { background: #f5f5f3; color: #888; font-weight: 600; padding: 9px 10px; text-align: right; border-bottom: 1px solid #e5e5e5; white-space: nowrap; }
+  th { background: #2a2a2a; color: #777; font-weight: 600; padding: 9px 10px; text-align: right; border-bottom: 1px solid #333; white-space: nowrap; }
   th:first-child { text-align: left; }
-  td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; color: #1a1a1a; text-align: right; white-space: nowrap; }
+  td { padding: 8px 10px; border-bottom: 1px solid #2e2e2e; color: #e8e8e6; text-align: right; white-space: nowrap; }
   td:first-child { text-align: left; font-weight: 500; }
   tr:last-child td { border-bottom: none; }
   .positive { color: #1baf7a; }
   .negative { color: #e34948; }
   .accent { color: #2a78d6; }
-  .highlight-row td { background: #f0f8ff; }
+  .highlight-row td { background: #0d2235; }
   .block { margin-bottom: 20px; }
 </style>
 </head>
@@ -254,8 +255,8 @@ function renderChart(rows) {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend:{display:false}, tooltip:{callbacks:{label: v => ' '+v.dataset.label+': '+(isBranch?v.raw+'개':v.raw+'억')}} },
       scales: {
-        x: {grid:{display:false}, ticks:{color:'#888', font:{size:12}}},
-        y: {grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#888', font:{size:11}, callback: v => isBranch?v+'개':v+'억'}, stacked: chartMode==='profit'},
+        x: {grid:{display:false}, ticks:{color:'#777', font:{size:12}}},
+        y: {grid:{color:'rgba(255,255,255,0.07)'}, ticks:{color:'#777', font:{size:11}, callback: v => isBranch?v+'개':v+'억'}, stacked: chartMode==='profit'},
       },
       interaction: {intersect:false, mode:'index'},
     }
