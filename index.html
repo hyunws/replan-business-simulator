@@ -100,10 +100,10 @@
   <div class="section-title">연도별 신규 오픈 지점 수</div>
   <div class="open-grid">
     <div class="year-card"><div class="year-label">2027</div><div class="year-count" id="cnt0">2</div><div class="year-btns"><button onclick="adj(0,-1)">−</button><button onclick="adj(0,+1)">+</button></div></div>
-    <div class="year-card"><div class="year-label">2028</div><div class="year-count" id="cnt1">3</div><div class="year-btns"><button onclick="adj(1,-1)">−</button><button onclick="adj(1,+1)">+</button></div></div>
-    <div class="year-card"><div class="year-label">2029</div><div class="year-count" id="cnt2">5</div><div class="year-btns"><button onclick="adj(2,-1)">−</button><button onclick="adj(2,+1)">+</button></div></div>
-    <div class="year-card"><div class="year-label">2030</div><div class="year-count" id="cnt3">7</div><div class="year-btns"><button onclick="adj(3,-1)">−</button><button onclick="adj(3,+1)">+</button></div></div>
-    <div class="year-card"><div class="year-label">2031</div><div class="year-count" id="cnt4">10</div><div class="year-btns"><button onclick="adj(4,-1)">−</button><button onclick="adj(4,+1)">+</button></div></div>
+    <div class="year-card"><div class="year-label">2028</div><div class="year-count" id="cnt1">5</div><div class="year-btns"><button onclick="adj(1,-1)">−</button><button onclick="adj(1,+1)">+</button></div></div>
+    <div class="year-card"><div class="year-label">2029</div><div class="year-count" id="cnt2">15</div><div class="year-btns"><button onclick="adj(2,-1)">−</button><button onclick="adj(2,+1)">+</button></div></div>
+    <div class="year-card"><div class="year-label">2030</div><div class="year-count" id="cnt3">30</div><div class="year-btns"><button onclick="adj(3,-1)">−</button><button onclick="adj(3,+1)">+</button></div></div>
+    <div class="year-card"><div class="year-label">2031</div><div class="year-count" id="cnt4">45</div><div class="year-btns"><button onclick="adj(4,-1)">−</button><button onclick="adj(4,+1)">+</button></div></div>
   </div>
 </div>
 
@@ -112,8 +112,8 @@
 <div class="ev-section block">
   <div class="section-title" style="margin-bottom:10px">예상 기업가치 (연 순익 × 멀티플)</div>
   <div class="ev-params">
-    <div class="ev-param"><span>멀티플 하단</span><input type="range" id="multLow" min="1" max="10" step="0.5" value="3"><span class="val" id="multLowVal">3x</span></div>
-    <div class="ev-param"><span>멀티플 상단</span><input type="range" id="multHigh" min="2" max="15" step="0.5" value="6"><span class="val" id="multHighVal">6x</span></div>
+    <div class="ev-param"><span>멀티플 하단</span><input type="range" id="multLow" min="1" max="10" step="0.5" value="5"><span class="val" id="multLowVal">5x</span></div>
+    <div class="ev-param"><span>멀티플 상단</span><input type="range" id="multHigh" min="2" max="15" step="0.5" value="15"><span class="val" id="multHighVal">15x</span></div>
   </div>
   <div class="ev-grid" id="evGrid"></div>
   <div class="calc-note" id="calcNote"></div>
@@ -141,7 +141,7 @@
 </div>
 
 <script>
-let newOpens = [2,3,5,7,10];
+let newOpens = [2,5,15,30,45];
 let chartMode = 'profit';
 let chart = null;
 const YEARS = [2027,2028,2029,2030,2031];
