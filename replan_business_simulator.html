@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>리플랜 지점 확장 시뮬레이터</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; padding: 24px; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 24px; }
+  .section-title { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 10px; }
+  .params-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .param-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px 14px; }
+  .param-label { font-size: 12px; color: #666; margin-bottom: 6px; }
+  .param-row { display: flex; align-items: center; gap: 8px; }
+  .param-row input[type=range] { flex: 1; accent-color: #2a78d6; }
+  .param-val { font-size: 13px; font-weight: 600; color: #1a1a1a; min-width: 56px; text-align: right; }
+  .open-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px; }
+  .year-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px; text-align: center; }
+  .year-label { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .year-count { font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
+  .year-btns { display: flex; justify-content: center; gap: 6px; }
+  .year-btns button { width: 28px; height: 28px; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f3; color: #1a1a1a; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .year-btns button:hover { background: #e5e5e5; }
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 20px; }
+  .metric-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px 14px; }
+  .metric-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+  .metric-value { font-size: 18px; font-weight: 600; color: #1a1a1a; }
+  .metric-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .ev-section { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+  .ev-params { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 14px; align-items: center; }
+  .ev-param { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666; }
+  .ev-param input[type=range] { width: 90px; accent-color: #2a78d6; }
+  .ev-param .val { font-weight: 600; color: #1a1a1a; min-width: 28px; }
+  .ev-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .ev-card { background: #f5f5f3; border: 1px solid #e5e5e5; border-radius: 8px; padding: 10px 12px; text-align: center; }
+  .ev-year { font-size: 11px; color: #aaa; margin-bottom: 3px; }
+  .ev-profit { font-size: 12px; color: #666; margin-bottom: 4px; }
+  .ev-value { font-size: 15px; font-weight: 600; color: #2a78d6; }
+  .ev-range { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .calc-note { font-size: 11px; color: #aaa; margin-top: 10px; }
+  .chart-area { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; font-size: 12px; color: #666; }
+  .chart-legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 2px; }
+  .line-dash { width: 18px; height: 2px; border-radius: 1px; }
+  .toggle-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .toggle-btn { padding: 5px 14px; border: 1px solid #ddd; border-radius: 6px; background: #fff; color: #666; font-size: 13px; cursor: pointer; }
+  .toggle-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .table-wrap { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 560px; }
+  th { background: #f5f5f3; color: #888; font-weight: 600; padding: 9px 10px; text-align: right; border-bottom: 1px solid #e5e5e5; white-space: nowrap; }
+  th:first-child { text-align: left; }
+  td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; color: #1a1a1a; text-align: right; white-space: nowrap; }
+  td:first-child { text-align: left; font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  .positive { color: #1baf7a; }
+  .negative { color: #e34948; }
+  .accent { color: #2a78d6; }
+  .highlight-row td { background: #f0f8ff; }
+  .block { margin-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<h1>리플랜 지점 확장 시뮬레이터</h1>
+<p class="subtitle">연도별 신규 오픈 수를 조정하며 자금·순익·기업가치를 시뮬레이션합니다</p>
+
+<div class="block">
+  <div class="section-title">기본 단위경제 설정</div>
+  <div class="params-grid">
+    <div class="param-card">
+      <div class="param-label">지점 개설비 (만원)</div>
+      <div class="param-row">
+        <input type="range" id="openCost" min="10000" max="50000" step="1000" value="27000">
+        <div class="param-val" id="openCostVal">2.7억</div>
+      </div>
+    </div>
+    <div class="param-card">
+      <div class="param-label">지점 풀가동 월 순익 (만원)</div>
+      <div class="param-row">
+        <input type="range" id="monthProfit" min="500" max="5000" step="100" value="2500">
+        <div class="param-val" id="monthProfitVal">2,500만</div>
+      </div>
+    </div>
+    <div class="param-card">
+      <div class="param-label">풀가동까지 소요 월수</div>
+      <div class="param-row">
+        <input type="range" id="rampMonth" min="1" max="24" step="1" value="6">
+        <div class="param-val" id="rampMonthVal">6개월</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="block">
+  <div class="section-title">연도별 신규 오픈 지점 수</div>
+  <div class="open-grid">
+    <div class="year-card"><div class="year-label">2027</div><div class="year-count" id="cnt0">2</div><div class="year-btns"><button onclick="adj(0,-1)">−</button><button onclick="adj(0,+1)">+</button></div></div>
+    <div class="year-card"><div class="year-label">2028</div><div class="year-count" id="cnt1">3</div><div class="year-btns"><button onclick="adj(1,-1)">−</button><button onclick="adj(1,+1)">+</button></div></div>
+    <div class="year-card"><div class="year-label">2029</div><div class="year-count" id="cnt2">5</div><div class="year-btns"><button onclick="adj(2,-1)">−</button><button onclick="adj(2,+1)">+</button></div></div>
+    <div class="year-card"><div class="year-label">2030</div><div class="year-count" id="cnt3">7</div><div class="year-btns"><button onclick="adj(3,-1)">−</button><button onclick="adj(3,+1)">+</button></div></div>
+    <div class="year-card"><div class="year-label">2031</div><div class="year-count" id="cnt4">10</div><div class="year-btns"><button onclick="adj(4,-1)">−</button><button onclick="adj(4,+1)">+</button></div></div>
+  </div>
+</div>
+
+<div class="metrics-grid" id="metricsGrid"></div>
+
+<div class="ev-section block">
+  <div class="section-title" style="margin-bottom:10px">예상 기업가치 (연 순익 × 멀티플)</div>
+  <div class="ev-params">
+    <div class="ev-param"><span>멀티플 하단</span><input type="range" id="multLow" min="1" max="10" step="0.5" value="3"><span class="val" id="multLowVal">3x</span></div>
+    <div class="ev-param"><span>멀티플 상단</span><input type="range" id="multHigh" min="2" max="15" step="0.5" value="6"><span class="val" id="multHighVal">6x</span></div>
+  </div>
+  <div class="ev-grid" id="evGrid"></div>
+  <div class="calc-note" id="calcNote"></div>
+</div>
+
+<div class="block">
+  <div class="toggle-row">
+    <button class="toggle-btn active" onclick="setChart('profit')" id="btn-profit">연 순익</button>
+    <button class="toggle-btn" onclick="setChart('cumprofit')" id="btn-cumprofit">누적 순익</button>
+    <button class="toggle-btn" onclick="setChart('branches')" id="btn-branches">지점 수</button>
+  </div>
+  <div class="chart-area">
+    <div class="chart-legend" id="chartLegend"></div>
+    <div style="position:relative;width:100%;height:280px">
+      <canvas id="mainChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="block">
+  <div class="section-title" style="margin-bottom:8px">연도별 상세 데이터</div>
+  <div class="table-wrap">
+    <table id="detailTable"></table>
+  </div>
+</div>
+
+<script>
+let newOpens = [2,3,5,7,10];
+let chartMode = 'profit';
+let chart = null;
+const YEARS = [2027,2028,2029,2030,2031];
+const EXISTING = 3;
+
+// 단위: 만원
+// 1억 = 10,000만원 / 1조 = 100,000,000만원 (이 시뮬에서 조 단위 불필요, 분기 없음)
+function fmtWon(만원) {
+  const abs = Math.abs(만원);
+  if (abs >= 10000) return (만원 / 10000).toFixed(0) + '억';
+  if (abs >= 1000)  return (만원 / 1000).toFixed(1) + '천만';
+  return Math.round(만원).toLocaleString() + '만';
+}
+
+function getParams() {
+  return {
+    openCost:    +document.getElementById('openCost').value,
+    monthProfit: +document.getElementById('monthProfit').value,
+    rampMonth:   +document.getElementById('rampMonth').value,
+    multLow:     +document.getElementById('multLow').value,
+    multHigh:    +document.getElementById('multHigh').value,
+  };
+}
+
+function calcSim() {
+  const p = getParams();
+  let totalBranches = EXISTING;
+  let cumFund = 0, cumProfit = 0;
+  let rows = [];
+  for (let i = 0; i < 5; i++) {
+    const n = newOpens[i];
+    const fundNeeded = n * p.openCost;
+    const existProfit = totalBranches * p.monthProfit * 12;
+    const rampM = Math.min(p.rampMonth, 12);
+    const fullM = Math.max(0, 12 - p.rampMonth);
+    const newProfit = n * p.monthProfit * (rampM * 0.5 + fullM);
+    const totalProfit = Math.round(existProfit + Math.max(0, newProfit));
+    cumFund += fundNeeded;
+    cumProfit += totalProfit;
+    totalBranches += n;
+    const evLow  = Math.round(totalProfit * p.multLow);
+    const evHigh = Math.round(totalProfit * p.multHigh);
+    rows.push({ year: YEARS[i], newOpens: n, totalBranches, fundNeeded,
+      existProfit: Math.round(existProfit), newProfit: Math.round(Math.max(0, newProfit)),
+      totalProfit, cumFund, cumProfit, evLow, evHigh });
+  }
+  return rows;
+}
+
+function render() {
+  const p = getParams();
+  const rows = calcSim();
+  const last = rows[rows.length - 1];
+  const bei = rows.findIndex(r => r.cumProfit >= r.cumFund);
+  const bey = bei >= 0 ? rows[bei].year : '-';
+
+  document.getElementById('metricsGrid').innerHTML = `
+    <div class="metric-card"><div class="metric-label">2031년 총 지점 수</div><div class="metric-value">${last.totalBranches}개</div><div class="metric-sub">기존 ${EXISTING} + 신규 ${newOpens.reduce((a,b)=>a+b,0)}</div></div>
+    <div class="metric-card"><div class="metric-label">5년 누적 투자금</div><div class="metric-value">${fmtWon(last.cumFund)}</div><div class="metric-sub">개설비 합계</div></div>
+    <div class="metric-card"><div class="metric-label">5년 누적 순익</div><div class="metric-value">${fmtWon(last.cumProfit)}</div><div class="metric-sub">2031년 말 기준</div></div>
+    <div class="metric-card"><div class="metric-label">2031년 연 순익</div><div class="metric-value">${fmtWon(last.totalProfit)}</div><div class="metric-sub">월 ${fmtWon(Math.round(last.totalProfit/12))}</div></div>
+    <div class="metric-card"><div class="metric-label">투자 회수 시점</div><div class="metric-value">${bey !== '-' ? bey+'년' : '미달성'}</div><div class="metric-sub">누적순익 ≥ 누적투자금</div></div>
+    <div class="metric-card"><div class="metric-label">2031년 예상 기업가치</div><div class="metric-value accent">${fmtWon(last.evLow)}~${fmtWon(last.evHigh)}</div><div class="metric-sub">${p.multLow}x~${p.multHigh}x 멀티플</div></div>
+  `;
+  renderEV(rows, p); renderChart(rows); renderTable(rows);
+}
+
+function renderEV(rows, p) {
+  document.getElementById('evGrid').innerHTML = rows.map(r => `
+    <div class="ev-card">
+      <div class="ev-year">${r.year}년</div>
+      <div class="ev-profit">연 순익 ${fmtWon(r.totalProfit)}</div>
+      <div class="ev-value">${fmtWon(Math.round((r.evLow+r.evHigh)/2))}</div>
+      <div class="ev-range">${fmtWon(r.evLow)} ~ ${fmtWon(r.evHigh)}</div>
+    </div>`).join('');
+  const ex = rows[rows.length-1];
+  document.getElementById('calcNote').textContent =
+    `계산: 연 순익 × 멀티플 = 기업가치 / 예시(2031): ${fmtWon(ex.totalProfit)} × ${p.multLow}~${p.multHigh}x = ${fmtWon(ex.evLow)}~${fmtWon(ex.evHigh)}`;
+}
+
+function renderChart(rows) {
+  const labels = rows.map(r => r.year+'');
+  let datasets, legend;
+  if (chartMode === 'profit') {
+    datasets = [
+      {label:'기존 지점 순익', data:rows.map(r=>+(r.existProfit/10000).toFixed(1)), backgroundColor:'#2a78d6', stack:'s', borderRadius:4, borderSkipped:false, order:1},
+      {label:'신규 지점 순익', data:rows.map(r=>+(r.newProfit/10000).toFixed(1)),   backgroundColor:'#1baf7a', stack:'s', borderRadius:4, borderSkipped:false, order:1},
+    ];
+    legend = [{type:'bar',color:'#2a78d6',label:'기존 지점 순익 (억)'},{type:'bar',color:'#1baf7a',label:'신규 지점 순익 (억)'}];
+  } else if (chartMode === 'cumprofit') {
+    datasets = [
+      {label:'누적 순익',   data:rows.map(r=>+(r.cumProfit/10000).toFixed(1)), backgroundColor:'#1baf7a', borderRadius:4, borderSkipped:false, type:'bar', order:2},
+      {label:'누적 투자금', data:rows.map(r=>+(r.cumFund/10000).toFixed(1)),   borderColor:'#e34948', backgroundColor:'transparent', borderWidth:2.5, type:'line', tension:0.3, pointRadius:5, pointBackgroundColor:'#e34948', pointBorderColor:'#fff', pointBorderWidth:1.5, fill:false, order:1},
+    ];
+    legend = [{type:'bar',color:'#1baf7a',label:'누적 순익 (억)'},{type:'line',color:'#e34948',label:'누적 투자금 (억)'}];
+  } else {
+    datasets = [{label:'총 지점 수', data:rows.map(r=>r.totalBranches), backgroundColor:'#4a3aa7', borderRadius:4, borderSkipped:false, order:1}];
+    legend = [{type:'bar',color:'#4a3aa7',label:'총 지점 수 (개)'}];
+  }
+  document.getElementById('chartLegend').innerHTML = legend.map(l =>
+    l.type==='line'
+      ? `<span><span class="line-dash" style="background:${l.color}"></span>${l.label}</span>`
+      : `<span><span class="dot" style="background:${l.color}"></span>${l.label}</span>`
+  ).join('');
+  const isBranch = chartMode === 'branches';
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  if (chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type: 'bar', data: {labels, datasets},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{display:false}, tooltip:{callbacks:{label: v => ' '+v.dataset.label+': '+(isBranch?v.raw+'개':v.raw+'억')}} },
+      scales: {
+        x: {grid:{display:false}, ticks:{color:'#888', font:{size:12}}},
+        y: {grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#888', font:{size:11}, callback: v => isBranch?v+'개':v+'억'}, stacked: chartMode==='profit'},
+      },
+      interaction: {intersect:false, mode:'index'},
+    }
+  });
+}
+
+function renderTable(rows) {
+  const p = getParams();
+  let html = `<thead><tr><th>연도</th><th>신규</th><th>누적 지점</th><th>투자금</th><th>연 순익</th><th>누적 순익</th><th>누적 투자금</th><th>회수율</th><th>기업가치 (중앙)</th></tr></thead><tbody>`;
+  rows.forEach(r => {
+    const roi = r.cumFund > 0 ? Math.round(r.cumProfit/r.cumFund*100) : 0;
+    const isBreak = r.cumProfit >= r.cumFund;
+    const evMid = Math.round((r.evLow+r.evHigh)/2);
+    html += `<tr${isBreak?' class="highlight-row"':''}>
+      <td>${r.year}${isBreak?' ✓':''}</td><td>${r.newOpens}개</td><td>${r.totalBranches}개</td>
+      <td class="negative">-${fmtWon(r.fundNeeded)}</td>
+      <td class="positive">+${fmtWon(r.totalProfit)}</td>
+      <td class="${r.cumProfit>0?'positive':''}">${fmtWon(r.cumProfit)}</td>
+      <td class="negative">-${fmtWon(r.cumFund)}</td>
+      <td class="${isBreak?'positive':''}">${roi}%</td>
+      <td class="accent">${fmtWon(evMid)}</td>
+    </tr>`;
+  });
+  html += '</tbody>';
+  document.getElementById('detailTable').innerHTML = html;
+}
+
+function adj(i, d) { newOpens[i]=Math.max(0,newOpens[i]+d); document.getElementById('cnt'+i).textContent=newOpens[i]; render(); }
+function setChart(mode) { chartMode=mode; ['profit','cumprofit','branches'].forEach(m=>document.getElementById('btn-'+m).classList.toggle('active',m===mode)); render(); }
+
+['openCost','monthProfit','rampMonth','multLow','multHigh'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    const v = +document.getElementById(id).value;
+    let d;
+    if (id==='openCost') d=(v/10000).toFixed(1)+'억';
+    else if (id==='monthProfit') d=v.toLocaleString()+'만';
+    else if (id==='rampMonth') d=v+'개월';
+    else d=v+'x';
+    document.getElementById(id+'Val').textContent=d;
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
